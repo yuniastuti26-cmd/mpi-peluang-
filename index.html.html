@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Interaktif Permutasi & Kombinasi - SMAN 1 Parongpong</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+        }
+        @keyframes bounce-happy {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.08); }
+        }
+        @keyframes head-shake {
+            0%, 100% { transform: translateX(0) rotate(0); }
+            20%, 60% { transform: translateX(-6px) rotate(-4deg); }
+            40%, 80% { transform: translateX(6px) rotate(4deg); }
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 0.4; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        .animate-float { animation: float 4s ease-in-out infinite; }
+        .animate-happy { animation: bounce-happy 0.6s ease infinite; }
+        .animate-shake { animation: head-shake 0.5s ease-in-out; }
+        .animate-pulse-ring { animation: pulse-ring 3s infinite; }
+
+        /* Custom Drag & Drop styling */
+        .draggable-item {
+            touch-action: none;
+            cursor: grab;
+        }
+        .draggable-item:active {
+            cursor: grabbing;
+        }
+        .drop-zone-active {
+            border-color: #2563eb !important;
+            background-color: #eff6ff !important;
+        }
+    </style>
+</head>
+<body class="h-full text-slate-800 font-sans flex flex-col justify-between antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- HEADER APP -->
+    <header class="bg-gradient-to-r from-brand-900 via-brand-800 to-brand-700 text-white shadow-lg sticky top-0 z-30">
+        <div class="max-w-6xl mx-auto px-4 py-3 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-inner">
+                    <i class="fa-solid me-0 fa-calculator text-2xl text-brand-200"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="bg-brand-500/30 text-brand-100 text-xs px-2.5 py-0.5 rounded-full border border-brand-300/30 font-medium">Kelas 12 / Fase F</span>
+                        <span class="bg-emerald-500/30 text-emerald-100 text-xs px-2 py-0.5 rounded-full border border-emerald-300/30 font-medium"><i class="fa-solid fa-brain me-1"></i>Deep Learning</span>
+                    </div>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight">Kuis Permutasi & Kombinasi</h1>
+                    <p class="text-xs text-brand-200 font-light">Pengembang: <span class="font-semibold text-white">Yuni Astuti, S.Pd.</span> | <span class="text-brand-100">SMAN 1 Parongpong</span></p>
+                </div>
+            </div>
+
+            <!-- Header Controls & Sound Toggle -->
+            <div class="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-xl backdrop-blur-md border border-white/10 text-xs sm:text-sm">
+                <button id="soundToggleBtn" onclick="toggleSound()" class="flex items-center gap-2 text-white hover:text-brand-200 transition-colors focus:outline-none" title="Matikan/Hidupkan Suara">
+                    <i id="soundIcon" class="fa-solid fa-volume-high text-lg text-emerald-300"></i>
+                    <span id="soundLabel" class="hidden sm:inline">Suara: On</span>
+                </button>
+                <div class="h-4 w-px bg-white/20"></div>
+                <div class="flex items-center gap-1.5 font-mono text-brand-100">
+                    <i class="fa-solid fa-bullseye text-brand-300"></i>
+                    <span>HOTS Interactive</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-6xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-grow w-full">
+        
+        <!-- WELCOME SCREEN -->
+        <div id="welcomeScreen" class="bg-white rounded-3xl shadow-xl border border-slate-100 p-6 sm:p-10 text-center max-w-3xl mx-auto my-4 transition-all duration-300">
+            <div class="relative w-32 h-32 mx-auto mb-6">
+                <div class="absolute inset-0 bg-brand-100 rounded-full animate-pulse-ring"></div>
+                <!-- Animated SVG Mascot - Idle -->
+                <svg id="mascotWelcome" class="w-32 h-32 relative z-10 animate-float drop-shadow-md" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="60" cy="60" r="50" fill="#2563eb" />
+                    <!-- Eyes -->
+                    <circle cx="45" cy="50" r="7" fill="#ffffff" />
+                    <circle cx="75" cy="50" r="7" fill="#ffffff" />
+                    <circle cx="46" cy="51" r="3.5" fill="#1e293b" />
+                    <circle cx="76" cy="51" r="3.5" fill="#1e293b" />
+                    <!-- Cheeks -->
+                    <circle cx="36" cy="62" r="5" fill="#f43f5e" opacity="0.4" />
+                    <circle cx="84" cy="62" r="5" fill="#f43f5e" opacity="0.4" />
+                    <!-- Smile -->
+                    <path d="M 45 70 Q 60 82 75 70" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" />
+                    <!-- Graduation Cap -->
+                    <polygon points="60,15 95,30 60,40 25,30" fill="#1e3a8a" />
+                    <polygon points="40,35 40,48 80,48 80,35" fill="#1d4ed8" />
+                    <circle cx="95" cy="30" r="3" fill="#fbbf24" />
+                    <line x1="95" y1="30" x2="100" y2="45" stroke="#fbbf24" stroke-width="2" />
+                </svg>
+            </div>
+
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 mb-3">Selamat Datang di Kuis Pembelajaran Matematika!</h2>
+            <p class="text-slate-600 mb-6 leading-relaxed text-sm sm:text-base">
+                Aplikasi kuis interaktif ini dirancang khusus untuk menguji dan memperdalam pemahaman konsep <span class="font-bold text-brand-700">Permutasi dan Kombinasi</span> dalam konteks kehidupan sehari-hari melalui pendekatan *Deep Learning*.
+            </p>
+
+            <!-- Learning Objective Card -->
+            <div class="bg-brand-50 rounded-2xl p-4 sm:p-5 text-left border border-brand-100 mb-8">
+                <div class="flex items-start gap-3">
+                    <div class="p-2 bg-brand-600 text-white rounded-xl mt-0.5">
+                        <i class="fa-solid fa-graduation-cap text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-brand-900 text-sm sm:text-base mb-1">Tujuan Pembelajaran:</h3>
+                        <p class="text-xs sm:text-sm text-brand-800 leading-relaxed">
+                            Peserta didik mampu menentukan nilai dari permutasi dan kombinasi dari permasalahan konteks kehidupan sehari-hari dengan bernalar kritis dan teliti.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Rules Summary -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8 text-center">
+                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
+                    <i class="fa-solid fa-list-check text-brand-600 text-xl mb-1"></i>
+                    <div class="text-xs font-bold text-slate-700">10 Soal HOTS</div>
+                    <div class="text-[10px] text-slate-500">Kontekstual</div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
+                    <i class="fa-solid fa-shuffle text-brand-600 text-xl mb-1"></i>
+                    <div class="text-xs font-bold text-slate-700">Variasi Tipe</div>
+                    <div class="text-[10px] text-slate-500">PG, B/S, Drag & Drop</div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
+                    <i class="fa-solid fa-comment-dots text-brand-600 text-xl mb-1"></i>
+                    <div class="text-xs font-bold text-slate-700">Umpan Balik</div>
+                    <div class="text-[10px] text-slate-500">Pembahasan Konsep</div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200">
+                    <i class="fa-solid fa-award text-brand-600 text-xl mb-1"></i>
+                    <div class="text-xs font-bold text-slate-700">Sertifikat Nilai</div>
+                    <div class="text-[10px] text-slate-500">Analisis Capaian</div>
+                </div>
+            </div>
+
+            <button onclick="startQuiz()" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white font-bold rounded-2xl shadow-lg shadow-brand-500/30 hover:shadow-xl hover:scale-105 active:scale-95 transition-all text-base flex items-center justify-center gap-3 mx-auto">
+                <span>Mulai Kuis Interaktif</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+
+        <!-- QUIZ ACTIVE INTERFACE -->
+        <div id="quizScreen" class="hidden space-y-6">
+            
+            <!-- Progress Bar & Top Meta -->
+            <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col gap-3">
+                <div class="flex justify-between items-center text-xs sm:text-sm font-semibold text-slate-600">
+                    <div class="flex items-center gap-2">
+                        <span id="questionCategoryBadge" class="bg-brand-100 text-brand-800 px-3 py-1 rounded-full font-bold text-xs">Pilihan Ganda</span>
+                        <span class="text-slate-400">|</span>
+                        <span id="questionProgressText">Soal 1 dari 10</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-1.5 text-emerald-600 font-bold bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                            <i class="fa-solid fa-star"></i>
+                            <span>Skor: <span id="currentScoreDisplay">0</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Progress Bar -->
+                <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden p-0.5 border border-slate-200">
+                    <div id="progressBar" class="bg-gradient-to-r from-brand-500 to-brand-700 h-full rounded-full transition-all duration-500 w-0"></div>
+                </div>
+            </div>
+
+            <!-- QUESTION CARD MAIN -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+                
+                <!-- Left/Main Question Area (3 cols) -->
+                <div class="lg:col-span-3 bg-white rounded-3xl shadow-md border border-slate-200 p-5 sm:p-8 space-y-6">
+                    
+                    <!-- Question Prompt Container -->
+                    <div>
+                        <div class="flex items-center gap-2 text-xs font-bold text-brand-600 uppercase tracking-wider mb-2">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <span>Skenario Masalah Real-World</span>
+                        </div>
+                        <h3 id="questionTitle" class="text-lg sm:text-xl font-bold text-slate-800 leading-snug">
+                            Loading pertanyaan...
+                        </h3>
+                    </div>
+
+                    <!-- Interactive Dynamic Options Box -->
+                    <div id="optionsContainer" class="space-y-3 pt-2">
+                        <!-- Dynamic options generated by JS -->
+                    </div>
+
+                    <!-- Action Controls (Submit / Next) -->
+                    <div class="pt-4 border-t border-slate-100 flex flex-wrap justify-between items-center gap-3">
+                        <button id="submitBtn" onclick="checkAnswer()" class="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <span>Kirim Jawaban</span>
+                        </button>
+
+                        <button id="nextBtn" onclick="nextQuestion()" class="hidden px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all items-center gap-2">
+                            <span>Soal Berikutnya</span>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Instant Concept Feedback Box -->
+                    <div id="feedbackBox" class="hidden p-5 rounded-2xl border transition-all duration-300">
+                        <div class="flex items-start gap-3">
+                            <div id="feedbackIcon" class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-xl font-bold text-white mt-0.5">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <div class="space-y-1">
+                                <h4 id="feedbackTitle" class="font-bold text-base sm:text-lg">Jawaban Benar!</h4>
+                                <div id="feedbackExplanation" class="text-xs sm:text-sm leading-relaxed space-y-2">
+                                    <!-- Dynamic concept explanation -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Mascot Assistant Sidebar (1 col) -->
+                <div class="lg:col-span-1 bg-gradient-to-b from-brand-50 to-indigo-50 rounded-3xl p-5 border border-brand-100 text-center flex flex-col items-center justify-between min-h-[320px]">
+                    <div class="w-full">
+                        <span class="text-xs font-bold text-brand-700 uppercase tracking-wider bg-white px-3 py-1 rounded-full shadow-sm border border-brand-200">
+                            Maskot Belajar
+                        </span>
+                    </div>
+
+                    <!-- Mascot Animated SVG Container -->
+                    <div class="my-4 relative">
+                        <svg id="mascotInteractive" class="w-32 h-32 mx-auto drop-shadow-md transition-all duration-300" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Base SVG Body -->
+                            <circle cx="60" cy="60" r="50" fill="#2563eb" id="mascotBody" />
+                            <!-- Eyes -->
+                            <g id="mascotEyes">
+                                <circle cx="45" cy="50" r="7" fill="#ffffff" />
+                                <circle cx="75" cy="50" r="7" fill="#ffffff" />
+                                <circle cx="46" cy="51" r="3.5" fill="#1e293b" id="pupilLeft" />
+                                <circle cx="76" cy="51" r="3.5" fill="#1e293b" id="pupilRight" />
+                            </g>
+                            <!-- Cheeks -->
+                            <circle cx="36" cy="62" r="5" fill="#f43f5e" opacity="0.4" />
+                            <circle cx="84" cy="62" r="5" fill="#f43f5e" opacity="0.4" />
+                            <!-- Mouth -->
+                            <path id="mascotMouth" d="M 45 70 Q 60 80 75 70" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" />
+                            <!-- Toga Cap -->
+                            <polygon points="60,15 95,30 60,40 25,30" fill="#1e3a8a" />
+                            <polygon points="40,35 40,48 80,48 80,35" fill="#1d4ed8" />
+                            <circle cx="95" cy="30" r="3" fill="#fbbf24" />
+                            <line x1="95" y1="30" x2="100" y2="45" stroke="#fbbf24" stroke-width="2" />
+                        </svg>
+                    </div>
+
+                    <!-- Mascot Speech Bubble -->
+                    <div class="bg-white p-3 rounded-2xl border border-brand-100 shadow-sm w-full text-xs text-slate-700 relative">
+                        <p id="mascotSpeech" class="italic font-medium">"Baca dengan cermat ya! Gunakan penalaran logika matematika."</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- RESULTS DASHBOARD SCREEN -->
+        <div id="resultsScreen" class="hidden bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-10 max-w-4xl mx-auto my-4 space-y-8">
+            
+            <!-- Dashboard Header -->
+            <div class="text-center space-y-3">
+                <div class="inline-flex items-center gap-2 bg-brand-100 text-brand-800 px-4 py-1.5 rounded-full text-xs font-bold">
+                    <i class="fa-solid fa-chart-line"></i> Laporan Capaian Pembelajaran
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-800">Hasil Kuis & Analisis Reflektif</h2>
+                <p class="text-slate-500 text-sm">SMAN 1 Parongpong • Matematika Kelas 12 (Permutasi & Kombinasi)</p>
+            </div>
+
+            <!-- Main Score Showcase Card -->
+            <div class="bg-gradient-to-br from-brand-900 via-brand-800 to-indigo-900 rounded-3xl p-6 sm:p-8 text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-9xl">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                
+                <div class="text-center sm:text-left space-y-2 z-10">
+                    <div class="text-brand-200 text-xs sm:text-sm font-semibold uppercase tracking-wider">Nilai Akhir Siswa</div>
+                    <div class="text-5xl sm:text-6xl font-black tracking-tight flex items-baseline justify-center sm:justify-start gap-1">
+                        <span id="finalScoreNumber">0</span>
+                        <span class="text-2xl text-brand-300 font-normal">/ 100</span>
+                    </div>
+                    <div id="scoreBadgeText" class="inline-block bg-white/20 px-3 py-1 rounded-lg text-xs font-medium border border-white/20">
+                        Memuat evaluasi...
+                    </div>
+                </div>
+
+                <div class="text-center bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/15 min-w-[200px] z-10">
+                    <div class="text-xs text-brand-200 mb-1">Akurasi Jawaban</div>
+                    <div id="accuracyPercent" class="text-3xl font-extrabold text-emerald-300">0%</div>
+                    <div class="text-[11px] text-brand-100 mt-1" id="correctCountsText">0 dari 10 Soal Benar</div>
+                </div>
+            </div>
+
+            <!-- Breakdown by Question Types -->
+            <div>
+                <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-cubes text-brand-600"></i>
+                    <span>Rincian Penguasaan Berdasarkan Jenis Soal</span>
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="typeBreakdownGrid">
+                    <!-- Breakdown Cards inserted by JS -->
+                </div>
+            </div>
+
+            <!-- Deep Learning Reflective Feedback Card -->
+            <div class="bg-amber-50 rounded-2xl p-5 border border-amber-200 space-y-2">
+                <div class="flex items-center gap-2 text-amber-900 font-bold text-base">
+                    <i class="fa-solid fa-lightbulb text-amber-600 text-lg"></i>
+                    <span>Pesan Reflektif Capaian Pembelajaran (Deep Learning)</span>
+                </div>
+                <p id="reflectiveMessage" class="text-xs sm:text-sm text-amber-900 leading-relaxed italic">
+                    Memuat ulasan reflektif...
+                </p>
+            </div>
+
+            <!-- Answer Details Accordion / Review Area -->
+            <div>
+                <button onclick="toggleAnswerReview()" class="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-all flex justify-between items-center text-sm">
+                    <span class="flex items-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <span>Tinjau Kembali Seluruh Soal & Pembahasan</span>
+                    </span>
+                    <i id="reviewChevron" class="fa-solid fa-chevron-down transition-transform"></i>
+                </button>
+
+                <div id="reviewContainer" class="hidden space-y-4 pt-4">
+                    <!-- Dynamic review list -->
+                </div>
+            </div>
+
+            <!-- Action Buttons Footer -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-4 border-t border-slate-100 justify-center">
+                <button onclick="restartQuiz()" class="px-8 py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    <span>Coba Kuis Lagi</span>
+                </button>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+        <div class="max-w-6xl mx-auto px-4">
+            <p>© 2026 Media Pembelajaran Digital Matematika • SMAN 1 Parongpong</p>
+            <p class="mt-1 text-[11px] text-slate-400">Dirancang oleh Yuni Astuti, S.Pd. berbasis Kurikulum Merdeka (Fase F - Kelas 12)</p>
+        </div>
+    </footer>
+
+    <!-- Canvas for Confetti Animation -->
+    <canvas id="confettiCanvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+    <script>
+        /* WEB AUDIO API SYNTHESIZER FOR SOUND EFFECTS */
+        let soundEnabled = true;
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new AudioCtx();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('soundIcon');
+            const label = document.getElementById('soundLabel');
+            if (soundEnabled) {
+                icon.className = "fa-solid fa-volume-high text-lg text-emerald-300";
+                label.textContent = "Suara: On";
+                playCorrectSound();
+            } else {
+                icon.className = "fa-solid fa-volume-xmark text-lg text-rose-300";
+                label.textContent = "Suara: Off";
+            }
+        }
+
+        function playCorrectSound() {
+            if (!soundEnabled) return;
+            initAudio();
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, now); // C5
+            osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+            osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2); // G5
+
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.4);
+        }
+
+        function playWrongSound() {
+            if (!soundEnabled) return;
+            initAudio();
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(220, now); // A3
+            osc.frequency.exponentialRampToValueAtTime(140, now + 0.25);
+
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        }
+
+        function playFanfare() {
+            if (!soundEnabled) return;
+            initAudio();
+            const notes = [523.25, 659.25, 783.99, 1046.50];
+            const now = audioCtx.currentTime;
+            notes.forEach((freq, idx) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.2, now + idx * 0.12);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.3);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now + idx * 0.12);
+                osc.stop(now + idx * 0.12 + 0.3);
+            });
+        }
+
+        /* QUESTION DATABASE (10 HOTS QUESTIONS) */
+        const quizData = [
+            {
+                id: 1,
+                type: 'pg',
+                typeName: 'Pilihan Ganda',
+                category: 'Permutasi Siklis dengan Syarat',
+                title: 'Pengurus OSIS SMAN 1 Parongpong mengadakan rapat evaluasi program kerja. Terdapat 6 orang pengurus (termasuk Ketua dan Wakil Ketua) yang duduk mengelilingi sebuah meja bundar. Jika Ketua dan Wakil Ketua harus selalu duduk berdampingan, ada berapa banyak susunan posisi duduk melingkar yang mungkin terjadi?',
+                options: [
+                    { id: 'A', text: '24 cara' },
+                    { id: 'B', text: '48 cara' },
+                    { id: 'C', text: '120 cara' },
+                    { id: 'D', text: '240 cara' },
+                    { id: 'E', text: '720 cara' }
+                ],
+                correctAnswer: 'B',
+                explanation: '<strong>Langkah Analisis Deep Learning:</strong><br/>1. Anggap Ketua & Wakil sebagai 1 kesatuan elemen (karena selalu berdampingan). Total elemen menjadi (6 - 1) = 5 elemen.<br/>2. Banyak cara menyusun 5 elemen pada meja bundar = (5 - 1)! = 4! = 24 cara.<br/>3. Ketua dan Wakil dapat bertukar posisi di antara mereka = 2! = 2 cara.<br/>4. Total susunan = 24 × 2 = <strong>48 cara</strong>.'
+            },
+            {
+                id: 2,
+                type: 'bs',
+                typeName: 'Benar / Salah',
+                category: 'Membedakan Konsep Permutasi vs Kombinasi',
+                title: 'Analisis dua skenario pemilihan di SMAN 1 Parongpong:<br/><b>Skenario A:</b> Memilih 3 siswa dari 10 calon pengurus untuk menjadi Ketua, Sekretaris, dan Bendahara.<br/><b>Skenario B:</b> Memilih 3 siswa dari 10 calon untuk mewakili sekolah dalam lomba Cerdas Cermat.<br/><br/><i>Pernyataan:</i> Skenario A dihitung menggunakan rumus Kombinasi $C(10,3) = 120$ cara, sedangkan Skenario B dihitung menggunakan rumus Permutasi $P(10,3) = 720$ cara.',
+                options: [
+                    { id: 'BENAR', text: 'BENAR' },
+                    { id: 'SALAH', text: 'SALAH' }
+                ],
+                correctAnswer: 'SALAH',
+                explanation: '<strong>Analisis Konsep:</strong><br/>• Pernyataan tersebut <strong>SALAH</strong> (terbalik).<br/>• Skenario A memperhatikan urutan/jabatan (Ketua ≠ Sekretaris), maka menggunakan <strong>Permutasi</strong> $P(10,3) = 720$.<br/>• Skenario B tidak memperhatikan urutan (semua berstatus sama sebagai anggota tim delegasi), maka menggunakan <strong>Kombinasi</strong> $C(10,3) = 120$.'
+            },
+            {
+                id: 3,
+                type: 'pgk',
+                typeName: 'Pilihan Ganda Kompleks',
+                category: 'Kombinasi Pembentukan Tim Bermuatan Khusus',
+                title: 'Tim karya ilmiah SMAN 1 Parongpong terdiri dari 5 siswa Laki-laki dan 4 siswa Perempuan. Guru akan memilih 4 siswa untuk mewakili lomba tingkat nasional dengan syarat <u>minimal harus ada 2 siswa Perempuan</u> dalam tim. Manakah dari opsi perhitungan berikut yang BENAR? (Pilih semua jawaban yang sesuai)',
+                options: [
+                    { id: 'opt1', text: 'Banyak cara memilih 2 Perempuan dan 2 Laki-laki adalah C(4,2) × C(5,2) = 60 cara.' },
+                    { id: 'opt2', text: 'Banyak cara memilih 3 Perempuan dan 1 Laki-laki adalah C(4,3) × C(5,1) = 20 cara.' },
+                    { id: 'opt3', text: 'Banyak cara memilih 4 Perempuan saja adalah C(4,4) = 1 cara.' },
+                    { id: 'opt4', text: 'Total seluruh kombinasi delegasi yang memenuhi syarat adalah 81 cara.' }
+                ],
+                correctAnswer: ['opt1', 'opt2', 'opt3', 'opt4'], // All are correct
+                explanation: '<strong>Penyelesaian Rinci:</strong><br/>• Syarat: minimal 2 Perempuan dari 4 anggota tim.<br/>• Kasus 1 (2P, 2L) = $C(4,2) \\times C(5,2) = 6 \\times 10 = 60$ cara. (Benar)<br/>• Kasus 2 (3P, 1L) = $C(4,3) \\times C(5,1) = 4 \\times 5 = 20$ cara. (Benar)<br/>• Kasus 3 (4P, 0L) = $C(4,4) = 1$ cara. (Benar)<br/>• Total Cara = $60 + 20 + 1 = <strong>81$ cara</strong>. Semua pernyataan bernilai BENAR!'
+            },
+            {
+                id: 4,
+                type: 'dnd',
+                typeName: 'Drag & Drop / Menjodohkan',
+                category: 'Aplikasi Konsep Kontekstual',
+                title: 'Jodohkanlah skenario kehidupan nyata di bawah ini dengan hasil nilai kombinatorika yang tepat!',
+                pairs: [
+                    { key: 'Kasus 1: Menyusun kode PIN ATM 4 angka berbeda dari angka 1, 2, 3, 4, 5, 6', val: '360' },
+                    { key: 'Kasus 2: Memilih 4 jenis buah dari 6 pilihan untuk membuat es buah segar', val: '15' },
+                    { key: 'Kasus 3: Banyaknya diagonal bidang pada segi-8 beraturan', val: '20' }
+                ],
+                optionsPool: ['360', '15', '20', '120'],
+                explanation: '<strong>Pembahasan Jodohkan:</strong><br/>1. PIN ATM (Urutan penting) = $P(6,4) = 6 \\times 5 \\times 4 \\times 3 = 360$.<br/>2. Memilih buah es (Urutan tak penting) = $C(6,4) = 15$.<br/>3. Diagonal bidang segi-8 = $C(8,2) - 8 = 28 - 8 = 20$.'
+            },
+            {
+                id: 5,
+                type: 'pg',
+                typeName: 'Pilihan Ganda',
+                category: 'Permutasi Unsur yang Sama',
+                title: 'Panitia bazar SMAN 1 Parongpong ingin menggantungkan 8 bendera sponsor secara berjejer pada tiang utama. Bendera tersebut terdiri dari 3 bendera Merah, 3 bendera Putih, dan 2 bendera Biru yang masing-masing identik. Banyak susunan susunan warna bendera berbeda yang dapat dibuat adalah...',
+                options: [
+                    { id: 'A', text: '560 susunan' },
+                    { id: 'B', text: '1.120 susunan' },
+                    { id: 'C', text: '3.360 susunan' },
+                    { id: 'D', text: '6.720 susunan' },
+                    { id: 'E', text: '40.320 susunan' }
+                ],
+                correctAnswer: 'A',
+                explanation: '<strong>Analisis Permutasi Unsur Sama:</strong><br/>• $n = 8$, unsur sama: $k_1 = 3$ (Merah), $k_2 = 3$ (Putih), $k_3 = 2$ (Biru).<br/>• Rumus: $P = \\frac{n!}{k_1! \\times k_2! \\times k_3!} = \\frac{8!}{3! \\times 3! \\times 2!} = \\frac{40.320}{6 \\times 6 \\times 2} = \\frac{40.320}{72} = <strong>560$ susunan</strong>.'
+            },
+            {
+                id: 6,
+                type: 'bs',
+                typeName: 'Benar / Salah',
+                category: 'Kombinasi Jabat Tangan Handshake Problem',
+                title: 'Pada acara perpisahan kelas 12 SMAN 1 Parongpong, setiap siswa saling berjabat tangan satu sama lain tepat satu kali. Jika total jabat tangan yang terjadi adalah 190 kali, maka jumlah seluruh siswa yang hadir pada acara tersebut adalah 20 orang.',
+                options: [
+                    { id: 'BENAR', text: 'BENAR' },
+                    { id: 'SALAH', text: 'SALAH' }
+                ],
+                correctAnswer: 'BENAR',
+                explanation: '<strong>Pembuktian Persamaan Kombinasi:</strong><br/>• Jabat tangan melibatkan 2 orang: $C(n,2) = 190$.<br/>• $\\frac{n(n-1)}{2} = 190 \\Rightarrow n(n-1) = 380$.<br/>• Cari dua bilangan bulat berurutan yang hasil kalinya 380: $20 \\times 19 = 380$.<br/>• Sehingga $n = 20$ orang. Pernyataan bernilai <strong>BENAR</strong>.'
+            },
+            {
+                id: 7,
+                type: 'pgk',
+                typeName: 'Pilihan Ganda Kompleks',
+                category: 'Analisis Permutasi Siklis Kompleks',
+                title: 'Dalam acara makan bersama, 7 orang anggota klub Matematika SMAN 1 Parongpong (termasuk Budi dan Siti) duduk mengelilingi meja makan bundar. Manakah dari pernyataan posisi duduk berikut yang BENAR? (Pilih semua opsi yang tepat)',
+                options: [
+                    { id: 'A', text: 'Jika Budi dan Siti HARUS duduk berdampingan, terdapat 240 cara susunan posisi.' },
+                    { id: 'B', text: 'Jika Budi dan Siti TIDAK BOLEH duduk berdampingan, terdapat 480 cara susunan posisi.' },
+                    { id: 'C', text: 'Total seluruh susunan tanpa syarat apapun adalah 5.040 cara.' },
+                    { id: 'D', text: 'Jika 3 orang tertentu selalu duduk berkelompok, terdapat 144 cara susunan.' }
+                ],
+                correctAnswer: ['A', 'B', 'D'],
+                explanation: '<strong>Ulasan Komprehensif:</strong><br/>• Total tanpa syarat = $(7-1)! = 6! = 720$ cara (Maka opsi C SALAH, 5040 adalah 7!).<br/>• Berdampingan (A) = $2! \\times (6-1)! = 2 \\times 120 = 240$ cara (BENAR).<br/>• Tidak berdampingan (B) = $720 - 240 = 480$ cara (BENAR).<br/>• 3 Orang berdampingan (D) = $3! \\times (5-1)! = 6 \\times 24 = 144$ cara (BENAR).'
+            },
+            {
+                id: 8,
+                type: 'dnd',
+                typeName: 'Mengurutkan (Reorder)',
+                category: 'Perbandingan Nilai Kombinaturik',
+                title: 'Urutkan skenario kombinatorika berikut berdasarkan <u>banyaknya cara yang dihasilkan</u> dari nilai <b>TERKECIL ke TERBESAR</b>!',
+                itemsToOrder: [
+                    { id: 'item1', text: 'Memilih 2 menu Makanan dari 5 pilihan yang ada (C(5,2))', value: 10 },
+                    { id: 'item2', text: 'Jumlah jabat tangan yang terjadi antara 6 orang (C(6,2))', value: 15 },
+                    { id: 'item3', text: 'Menyusun kata 3 huruf dari kata "BINTANG" tanpa pengulangan (P(7,3))', value: 210 },
+                    { id: 'item4', text: 'Memilih tim basket berisi 5 orang dari 10 calon pemain (C(10,5))', value: 252 }
+                ],
+                explanation: '<strong>Urutan Perhitungan Tepat:</strong><br/>1. $C(5,2) = 10$ cara.<br/>2. $C(6,2) = 15$ cara.<br/>3. $P(7,3) = 7 \\times 6 \\times 5 = 210$ cara.<br/>4. $C(10,5) = 252$ cara.<br/>Urutan terkecil ke terbesar adalah 10 → 15 → 210 → 252.'
+            },
+            {
+                id: 9,
+                type: 'pg',
+                typeName: 'Pilihan Ganda',
+                category: 'Kombinasi & Permutasi Pengelompokan',
+                title: 'Perpustakaan SMAN 1 Parongpong memiliki 6 buku Matematika berbeda dan 4 buku Fisika berbeda. Bu Yuni memilih 3 buku Matematika dan 2 buku Fisika, lalu menyusun kelima buku tersebut secara berjejer di rak dengan syarat <u>buku sejenis harus selalu berkelompok</u>. Banyak cara penyusunan buku tersebut adalah...',
+                options: [
+                    { id: 'A', text: '120 cara' },
+                    { id: 'B', text: '720 cara' },
+                    { id: 'C', text: '1.440 cara' },
+                    { id: 'D', text: '2.880 cara' },
+                    { id: 'E', text: '5.760 cara' }
+                ],
+                correctAnswer: 'D',
+                explanation: '<strong>Langkah-Langkah Bertahap (Deep Learning):</strong><br/>1. Memilih 3 buku Mtk dari 6: $C(6,3) = 20$.<br/>2. Memilih 2 buku Fisika dari 4: $C(4,2) = 6$.<br/>3. Menyusun 3 buku Mtk di kelompoknya: $3! = 6$.<br/>4. Menyusun 2 buku Fisika di kelompoknya: $2! = 2$.<br/>5. Menyusun 2 kelompok (Mtk & Fisika): $2! = 2$.<br/>Total cara = $20 \\times 6 \\times (6 \\times 2 \\times 2) = 120 \\times 24 = <strong>2.880$ cara</strong>.'
+            },
+            {
+                id: 10,
+                type: 'bs',
+                typeName: 'Benar / Salah',
+                category: 'Aplikasi Kombinasi pada Jalur Rute Grid',
+                title: 'Seorang siswa berkendara dari Parongpong ke Lembang melalui peta grid jalan. Rute membutuhkan perpindahan 4 langkah ke Timur dan 3 langkah ke Utara (total 7 langkah grid). Banyak rute terpendek yang dapat dipilih siswa tersebut adalah 35 rute.',
+                options: [
+                    { id: 'BENAR', text: 'BENAR' },
+                    { id: 'SALAH', text: 'SALAH' }
+                ],
+                correctAnswer: 'BENAR',
+                explanation: '<strong>Analisis Kombinasi Jalur:</strong><br/>• Masalah memilih 4 langkah Timur dari total 7 langkah perpindahan sama dengan kombinasi $C(7,4)$.<br/>• $C(7,4) = \\frac{7 \\times 6 \\times 5 \\times 4}{4 \\times 3 \\times 2 \\times 1} = 35$ rute.<br/>Pernyataan ini adalah <strong>BENAR</strong>.'
+            }
+        ];
+
+        /* APP STATE MANAGEMENT */
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let userAnswers = {}; // { questionId: answer }
+        let currentDragState = {}; // for DnD matching
+        let currentOrderState = []; // for Reordering
+
+        /* MASCOT CONTROLLER FUNCTIONS */
+        function setMascotState(state, customSpeech) {
+            const body = document.getElementById('mascotBody');
+            const mouth = document.getElementById('mascotMouth');
+            const speech = document.getElementById('mascotSpeech');
+            const mascotSvg = document.getElementById('mascotInteractive');
+
+            if (!mascotSvg) return;
+
+            mascotSvg.classList.remove('animate-happy', 'animate-shake', 'animate-float');
+
+            if (state === 'happy') {
+                body.setAttribute('fill', '#10b981'); // Emerald green
+                mouth.setAttribute('d', 'M 40 68 Q 60 90 80 68 Z'); // Big open smile
+                mouth.setAttribute('fill', '#ffffff');
+                mascotSvg.classList.add('animate-happy');
+                speech.textContent = customSpeech || "Hebat sekali! Penalaran matematikamu sangat tepat!";
+            } else if (state === 'sad') {
+                body.setAttribute('fill', '#f43f5e'); // Rose red
+                mouth.setAttribute('d', 'M 45 75 Q 60 62 75 75'); // Frown
+                mouth.setAttribute('fill', 'none');
+                mascotSvg.classList.add('animate-shake');
+                speech.textContent = customSpeech || "Tidak apa-apa! Mari cermati konsep penjelasannya ya.";
+            } else {
+                body.setAttribute('fill', '#2563eb'); // Brand blue
+                mouth.setAttribute('d', 'M 45 70 Q 60 80 75 70'); // Normal smile
+                mouth.setAttribute('fill', 'none');
+                mascotSvg.classList.add('animate-float');
+                speech.textContent = customSpeech || "Baca dengan cermat ya! Gunakan penalaran logika matematika.";
+            }
+        }
+
+        function startQuiz() {
+            initAudio();
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('quizScreen').classList.remove('hidden');
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = {};
+            updateScoreDisplay();
+            renderQuestion();
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('currentScoreDisplay').textContent = score;
+            const progress = ((currentQuestionIndex + 1) / quizData.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('questionProgressText').textContent = `Soal ${currentQuestionIndex + 1} dari ${quizData.length}`;
+        }
+
+        function renderQuestion() {
+            const q = quizData[currentQuestionIndex];
+            
+            // Reset UI components
+            document.getElementById('questionCategoryBadge').textContent = q.typeName;
+            document.getElementById('questionTitle').innerHTML = q.title;
+            document.getElementById('feedbackBox').classList.add('hidden');
+            document.getElementById('submitBtn').classList.remove('hidden');
+            document.getElementById('nextBtn').classList.add('hidden');
+            setMascotState('neutral');
+            updateScoreDisplay();
+
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+
+            // Render according to question type
+            if (q.type === 'pg' || q.type === 'bs') {
+                q.options.forEach(opt => {
+                    const btn = document.createElement('label');
+                    btn.className = "flex items-center gap-3 p-4 rounded-2xl border-2 border-slate-200 hover:border-brand-400 hover:bg-brand-50/50 cursor-pointer transition-all";
+                    btn.innerHTML = `
+                        <input type="radio" name="quizOption" value="${opt.id}" class="w-5 h-5 text-brand-600 focus:ring-brand-500">
+                        <span class="text-slate-800 text-sm sm:text-base font-medium">${opt.id ? `<b class="me-1">${opt.id}.</b>` : ''}${opt.text}</span>
+                    `;
+                    container.appendChild(btn);
+                });
+            } else if (q.type === 'pgk') {
+                const hint = document.createElement('div');
+                hint.className = "text-xs font-bold text-brand-600 mb-2 flex items-center gap-1.5";
+                hint.innerHTML = '<i class="fa-solid fa-square-check"></i> Pilih satu atau lebih jawaban yang menurutmu benar:';
+                container.appendChild(hint);
+
+                q.options.forEach(opt => {
+                    const btn = document.createElement('label');
+                    btn.className = "flex items-start gap-3 p-4 rounded-2xl border-2 border-slate-200 hover:border-brand-400 hover:bg-brand-50/50 cursor-pointer transition-all";
+                    btn.innerHTML = `
+                        <input type="checkbox" name="quizOption" value="${opt.id}" class="w-5 h-5 mt-0.5 text-brand-600 rounded focus:ring-brand-500">
+                        <span class="text-slate-800 text-xs sm:text-sm font-medium leading-relaxed">${opt.text}</span>
+                    `;
+                    container.appendChild(btn);
+                });
+            } else if (q.type === 'dnd') {
+                // Drag and Drop / Select connector
+                currentDragState = {};
+                const grid = document.createElement('div');
+                grid.className = "space-y-4";
+
+                q.pairs.forEach((pair, idx) => {
+                    const card = document.createElement('div');
+                    card.className = "p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3";
+                    
+                    let optionsSelect = `<option value="">-- Pilih Nilai Pasangan --</option>`;
+                    q.optionsPool.forEach(val => {
+                        optionsSelect += `<option value="${val}">${val}</option>`;
+                    });
+
+                    card.innerHTML = `
+                        <div class="text-xs sm:text-sm font-medium text-slate-800 flex-grow">${pair.key}</div>
+                        <select onchange="handleSelectMatch('${pair.key}', this.value)" class="p-2.5 bg-white border-2 border-brand-200 rounded-xl text-xs sm:text-sm font-bold text-brand-800 focus:outline-none focus:border-brand-600">
+                            ${optionsSelect}
+                        </select>
+                    `;
+                    grid.appendChild(card);
+                });
+                container.appendChild(grid);
+            } else if (q.type === 'dnd' || q.type === 'Mengurutkan (Reorder)') {
+                // Reorder type
+                currentOrderState = [...q.itemsToOrder];
+                renderReorderList();
+            }
+        }
+
+        function renderReorderList() {
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+
+            const hint = document.createElement('p');
+            hint.className = "text-xs font-bold text-brand-600 mb-2";
+            hint.innerHTML = '<i class="fa-solid fa-up-down"></i> Gunakan tombol panah untuk mengurutkan dari TERKECIL ke TERBESAR:';
+            container.appendChild(hint);
+
+            currentOrderState.forEach((item, idx) => {
+                const row = document.createElement('div');
+                row.className = "flex items-center justify-between p-3.5 bg-slate-50 border-2 border-slate-200 rounded-2xl gap-3";
+                row.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-7 h-7 rounded-xl bg-brand-600 text-white font-bold text-xs flex items-center justify-center">${idx + 1}</span>
+                        <span class="text-xs sm:text-sm font-medium text-slate-800">${item.text}</span>
+                    </div>
+                    <div class="flex gap-1 shrink-0">
+                        <button onclick="moveOrderItem(${idx}, -1)" ${idx === 0 ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="p-2 bg-white hover:bg-brand-100 border text-brand-700 rounded-lg text-xs font-bold"'}>
+                            <i class="fa-solid fa-arrow-up"></i>
+                        </button>
+                        <button onclick="moveOrderItem(${idx}, 1)" ${idx === currentOrderState.length - 1 ? 'disabled class="opacity-30 cursor-not-allowed"' : 'class="p-2 bg-white hover:bg-brand-100 border text-brand-700 rounded-lg text-xs font-bold"'}>
+                            <i class="fa-solid fa-arrow-down"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function moveOrderItem(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= currentOrderState.length) return;
+            const temp = currentOrderState[index];
+            currentOrderState[index] = currentOrderState[newIndex];
+            currentOrderState[newIndex] = temp;
+            renderReorderList();
+        }
+
+        function handleSelectMatch(key, value) {
+            currentDragState[key] = value;
+        }
+
+        function checkAnswer() {
+            const q = quizData[currentQuestionIndex];
+            let isCorrect = false;
+            let userAns = null;
+
+            if (q.type === 'pg' || q.type === 'bs') {
+                const selected = document.querySelector('input[name="quizOption"]:checked');
+                if (!selected) {
+                    alert("Silakan pilih salah satu jawaban terlebih dahulu!");
+                    return;
+                }
+                userAns = selected.value;
+                isCorrect = (userAns === q.correctAnswer);
+            } else if (q.type === 'pgk') {
+                const checkboxes = document.querySelectorAll('input[name="quizOption"]:checked');
+                userAns = Array.from(checkboxes).map(cb => cb.value);
+                if (userAns.length === 0) {
+                    alert("Silakan pilih minimal satu opsi!");
+                    return;
+                }
+                // Compare arrays
+                const correctSet = new Set(q.correctAnswer);
+                const userSet = new Set(userAns);
+                isCorrect = (correctSet.size === userSet.size && [...correctSet].every(x => userSet.has(x)));
+            } else if (q.type === 'dnd' && q.pairs) {
+                // Check all pairs answered
+                if (Object.keys(currentDragState).length < q.pairs.length) {
+                    alert("Silakan jodohkan semua pasangan kasus!");
+                    return;
+                }
+                userAns = { ...currentDragState };
+                isCorrect = q.pairs.every(p => currentDragState[p.key] === p.val);
+            } else if (q.type === 'dnd' || q.itemsToOrder) {
+                userAns = [...currentOrderState];
+                // Check if values are sorted ascending
+                isCorrect = true;
+                for (let i = 0; i < currentOrderState.length - 1; i++) {
+                    if (currentOrderState[i].value > currentOrderState[i + 1].value) {
+                        isCorrect = false;
+                        break;
+                    }
+                }
+            }
+
+            // Save user answer
+            userAnswers[q.id] = { userAns, isCorrect };
+
+            // Update score
+            if (isCorrect) {
+                score += 10;
+                playCorrectSound();
+                setMascotState('happy');
+            } else {
+                playWrongSound();
+                setMascotState('sad');
+            }
+
+            // Show feedback
+            showFeedback(isCorrect, q.explanation);
+        }
+
+        function showFeedback(isCorrect, explanationHTML) {
+            document.getElementById('submitBtn').classList.add('hidden');
+            document.getElementById('nextBtn').classList.remove('hidden');
+
+            const fbBox = document.getElementById('feedbackBox');
+            const fbIcon = document.getElementById('feedbackIcon');
+            const fbTitle = document.getElementById('feedbackTitle');
+            const fbExp = document.getElementById('feedbackExplanation');
+
+            fbBox.classList.remove('hidden', 'bg-emerald-50', 'border-emerald-200', 'text-emerald-900', 'bg-rose-50', 'border-rose-200', 'text-rose-900');
+
+            if (isCorrect) {
+                fbBox.classList.add('bg-emerald-50', 'border-emerald-200', 'text-emerald-900');
+                fbIcon.className = "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-xl font-bold bg-emerald-600 text-white mt-0.5";
+                fbIcon.innerHTML = '<i class="fa-solid fa-check"></i>';
+                fbTitle.textContent = "Sangat Tepat! Jawaban Kamu Benar (+10)";
+            } else {
+                fbBox.classList.add('bg-rose-50', 'border-rose-200', 'text-rose-900');
+                fbIcon.className = "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-xl font-bold bg-rose-600 text-white mt-0.5";
+                fbIcon.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                fbTitle.textContent = "Belum Tepat, Mari Pelajari Pembahasannya!";
+            }
+
+            fbExp.innerHTML = explanationHTML;
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                renderQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+
+            const totalScore = score; // Max 100
+            document.getElementById('finalScoreNumber').textContent = totalScore;
+            document.getElementById('accuracyPercent').textContent = `${totalScore}%`;
+
+            let correctCount = 0;
+            Object.values(userAnswers).forEach(ans => { if (ans.isCorrect) correctCount++; });
+            document.getElementById('correctCountsText').textContent = `${correctCount} dari ${quizData.length} Soal Benar`;
+
+            // Score badge & Reflective Message
+            const badge = document.getElementById('scoreBadgeText');
+            const reflective = document.getElementById('reflectiveMessage');
+
+            if (totalScore >= 80) {
+                badge.textContent = "Predikat: Sangat Baik / Mahir";
+                reflective.textContent = "Luar biasa! Anda telah menguasai penalaran matematis HOTS pada materi Permutasi dan Kombinasi secara mendalam. Anda mampu membedakan urutan posisi dan syarat khusus pada konteks kehidupan nyata dengan sangat teliti.";
+                triggerConfetti();
+                playFanfare();
+            } else if (totalScore >= 70) {
+                badge.textContent = "Predikat: Baik / Cukup Mahir";
+                reflective.textContent = "Selamat! Penguasaan konsep Anda sudah berada di atas ambang kelulusan. Disarankan untuk meninjau kembali soal permutasi bersyarat dan permutasi siklis untuk menyempurnakan pemahaman Anda.";
+                triggerConfetti();
+                playFanfare();
+            } else {
+                badge.textContent = "Predikat: Perlu Penguatan Konsep";
+                reflective.textContent = "Tetap semangat! Matematika adalah seni berlatih bernalar. Silakan pelajari kembali perbedaan mendasar antara Permutasi (memperhatikan urutan) dan Kombinasi (tanpa memperhatikan urutan) melalui bagian ulasan pembahasan di bawah.";
+            }
+
+            // Generate Breakdown Grid
+            renderBreakdownGrid();
+
+            // Render Review Items
+            renderReviewItems();
+        }
+
+        function renderBreakdownGrid() {
+            const grid = document.getElementById('typeBreakdownGrid');
+            grid.innerHTML = '';
+
+            const types = [
+                { type: 'pg', label: 'Pilihan Ganda' },
+                { type: 'bs', label: 'Benar / Salah' },
+                { type: 'pgk', label: 'PG Kompleks' },
+                { type: 'dnd', label: 'Drag & Drop / Urut' }
+            ];
+
+            types.forEach(t => {
+                const totalInType = quizData.filter(q => q.type === t.type).length;
+                let correctInType = 0;
+                quizData.filter(q => q.type === t.type).forEach(q => {
+                    if (userAnswers[q.id] && userAnswers[q.id].isCorrect) correctInType++;
+                });
+
+                const card = document.createElement('div');
+                card.className = "p-4 rounded-2xl bg-slate-50 border border-slate-200 text-center";
+                card.innerHTML = `
+                    <div class="text-xs font-bold text-slate-500 mb-1">${t.label}</div>
+                    <div class="text-2xl font-black ${correctInType === totalInType ? 'text-emerald-600' : 'text-brand-700'}">${correctInType} / ${totalInType}</div>
+                    <div class="text-[10px] text-slate-400 mt-1">Soal Tepat</div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderReviewItems() {
+            const container = document.getElementById('reviewContainer');
+            container.innerHTML = '';
+
+            quizData.forEach((q, idx) => {
+                const ans = userAnswers[q.id];
+                const card = document.createElement('div');
+                card.className = `p-4 sm:p-5 rounded-2xl border ${ans && ans.isCorrect ? 'bg-emerald-50/50 border-emerald-200' : 'bg-rose-50/50 border-rose-200'} space-y-2`;
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-xs font-bold ${ans && ans.isCorrect ? 'text-emerald-700' : 'text-rose-700'}">
+                            No. ${idx + 1} (${q.typeName}) - ${ans && ans.isCorrect ? 'BENAR' : 'SALAH'}
+                        </span>
+                        <span class="text-xs font-mono font-bold">${ans && ans.isCorrect ? '+10' : '+0'}</span>
+                    </div>
+                    <div class="text-xs sm:text-sm font-semibold text-slate-800">${q.title}</div>
+                    <div class="text-xs text-slate-600 bg-white p-3 rounded-xl border border-slate-200 mt-2">
+                        ${q.explanation}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function toggleAnswerReview() {
+            const rev = document.getElementById('reviewContainer');
+            const chev = document.getElementById('reviewChevron');
+            if (rev.classList.contains('hidden')) {
+                rev.classList.remove('hidden');
+                chev.classList.add('rotate-180');
+            } else {
+                rev.classList.add('hidden');
+                chev.classList.remove('rotate-180');
+            }
+        }
+
+        function restartQuiz() {
+            document.getElementById('resultsScreen').classList.add('hidden');
+            startQuiz();
+        }
+
+        function triggerConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const colors = ['#2563eb', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#3b82f6'];
+
+            for (let i = 0; i < 120; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    vy: Math.random() * 3 + 2,
+                    vx: Math.random() * 2 - 1,
+                    rot: Math.random() * 360,
+                    vRot: Math.random() * 6 - 3
+                });
+            }
+
+            let animationFrame;
+            function render() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let alive = false;
+
+                particles.forEach(p => {
+                    p.y += p.vy;
+                    p.x += p.vx;
+                    p.rot += p.vRot;
+
+                    if (p.y < canvas.height) alive = true;
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rot * Math.PI) / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    ctx.restore();
+                });
+
+                if (alive) {
+                    animationFrame = requestAnimationFrame(render);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+
+            render();
+        }
+
+        // Handle Window Resize
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('confettiCanvas');
+            if (canvas) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+        });
+    </script>
+</body>
+</html>
